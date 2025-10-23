@@ -24,11 +24,11 @@ interface Internship {
     reasoning?: string;
 }
 
-const API_KEY = process.env.API_KEY;
+const API_KEY = process.env.GEMINI_API_KEY;
 
 if (!API_KEY) {
     // This will cause the function to fail deployment if the key isn't set, which is a good thing.
-    throw new Error("API_KEY environment variable not set for the serverless function.");
+    throw new Error("GEMINI_API_KEY environment variable not set for the serverless function.");
 }
 
 const ai = new GoogleGenAI({ apiKey: API_KEY });
