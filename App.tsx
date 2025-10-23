@@ -90,13 +90,13 @@ const InternshipFinder: React.FC = () => {
                  const resultsMap = new Map<string, Internship>();
                  results.forEach(r => resultsMap.set(`${r.company}-${r.role}`, r));
 
-                 const updatedInternships = internships.map(i => {
+                 const updatedInternships = internships.map((i: Internship) => {
                      const key = `${i.company}-${i.role}`;
                      if (resultsMap.has(key)) {
                          return resultsMap.get(key)!;
                      }
                      return i;
-                 }).sort((a, b) => (b.matchScore || 0) - (a.matchScore || 0));
+                 }).sort((a: Internship, b: Internship) => (b.matchScore || 0) - (a.matchScore || 0));
 
                  setMatchedInternships(updatedInternships);
             } else {
@@ -116,15 +116,15 @@ const InternshipFinder: React.FC = () => {
     };
 
     const handleToggleSave = (internshipToToggle: Internship) => {
-        setSavedInternships(prevSaved => {
+        setSavedInternships((prevSaved: Internship[]) => {
             const isAlreadySaved = prevSaved.some(
-                saved => saved.company === internshipToToggle.company && saved.role === internshipToToggle.role
+                (saved: Internship) => saved.company === internshipToToggle.company && saved.role === internshipToToggle.role
             );
     
             let newSavedList;
             if (isAlreadySaved) {
                 newSavedList = prevSaved.filter(
-                    saved => !(saved.company === internshipToToggle.company && saved.role === internshipToToggle.role)
+                    (saved: Internship) => !(saved.company === internshipToToggle.company && saved.role === internshipToToggle.role)
                 );
             } else {
                 newSavedList = [...prevSaved, internshipToToggle];
@@ -147,7 +147,7 @@ const InternshipFinder: React.FC = () => {
                     <section id="saved-section" className="mb-16">
                         <h3 className="text-2xl font-light text-center mb-10 text-neutral-900 dark:text-white">Your Saved Internships</h3>
                         <div className="space-y-8">
-                            {savedInternships.map(internship => (
+                            {savedInternships.map((internship: Internship) => (
                                 <InternshipCard
                                     key={`saved-${internship.company}-${internship.role}`}
                                     internship={internship}
@@ -180,9 +180,9 @@ const InternshipFinder: React.FC = () => {
                             <h3 className="text-2xl font-light text-center mb-4 text-neutral-900 dark:text-white">Your Internship Matches</h3>
                             <p className="text-center text-neutral-500 dark:text-neutral-400 mb-10">Here are all available internships, sorted by relevance to your profile.</p>
                             <div className="space-y-8">
-                                {matchedInternships.map((internship, index) => {
+                                {matchedInternships.map((internship: Internship, index: number) => {
                                     const isSaved = savedInternships.some(
-                                        saved => saved.company === internship.company && saved.role === internship.role
+                                        (saved: Internship) => saved.company === internship.company && saved.role === internship.role
                                     );
                                     return (
                                         <InternshipCard
@@ -234,12 +234,12 @@ const App: React.FC = () => {
 
     useEffect(() => {
         if (supabase) {
-            supabase.auth.getSession().then(({ data: { session } }) => {
+            supabase.auth.getSession().then(({ data: { session } }: { data: { session: Session | null } }) => {
                 setSession(session);
                 setAuthLoading(false);
             });
 
-            const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            const { data: { subscription } } = supabase.auth.onAuthStateChange((_event: string, session: Session | null) => {
                 setSession(session);
             });
 
