@@ -33,8 +33,8 @@ Follow these instructions to get a copy of the project up and running on your lo
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/your-username/internify-app.git
-    cd internify-app
+    git clone https://github.com/CharanRakindi/internify.git
+    cd internify
     ```
 
 2.  **Install dependencies:**
@@ -44,20 +44,20 @@ Follow these instructions to get a copy of the project up and running on your lo
 
 3.  **Set up environment variables:**
 
-    Create a `.env` file in the root of the project by copying the example file:
+    Copy the example environment file:
     ```bash
     cp .env.example .env
     ```
 
     Now, open the `.env` file and add your credentials:
 
-    -   `API_KEY`: Your Google Gemini API key. You can get one from [Google AI Studio](https://aistudio.google.com/app/apikey).
+    -   `GEMINI_API_KEY`: Your Google Gemini API key. You can get one from [Google AI Studio](https://aistudio.google.com/app/apikey).
     -   `SUPABASE_URL`: Your Supabase project URL.
     -   `SUPABASE_ANON_KEY`: Your Supabase project's `anon` (public) key.
 
     Your `.env` file should look like this:
     ```
-    API_KEY="YOUR_GEMINI_API_KEY"
+    GEMINI_API_KEY="YOUR_GEMINI_API_KEY"
     SUPABASE_URL="https://your-project-id.supabase.co"
     SUPABASE_ANON_KEY="your-public-anon-key"
     ```
@@ -86,7 +86,45 @@ The workflow is as follows:
 
 This project is configured for easy deployment on [Netlify](https://www.netlify.com/).
 
-1.  Push your code to a GitHub repository.
-2.  Connect your repository to a new site on Netlify.
-3.  Configure the environment variables in the Netlify dashboard (under `Site settings > Build & deploy > Environment`). Add the same `API_KEY`, `SUPABASE_URL`, and `SUPABASE_ANON_KEY` that you used in your `.env` file.
-4.  Trigger a deploy. Netlify will automatically build and deploy your site and serverless function.
+### Steps to Deploy:
+
+1.  **Prepare your repository:**
+    - Ensure `.env` is in `.gitignore` (it already is)
+    - Commit all code to GitHub
+    ```bash
+    git add .
+    git commit -m "Ready for production deployment"
+    git push origin main
+    ```
+
+2.  **Connect to Netlify:**
+    - Go to [Netlify](https://app.netlify.com)
+    - Click "Add new site" → "Import an existing project"
+    - Select your GitHub repository
+
+3.  **Configure environment variables:**
+    - In Netlify Dashboard, go to `Site settings` → `Build & deploy` → `Environment`
+    - Add these variables:
+      - `GEMINI_API_KEY`: Your Google Gemini API key
+      - `SUPABASE_URL`: Your Supabase URL
+      - `SUPABASE_ANON_KEY`: Your Supabase anonymous key
+
+4.  **Set build settings:**
+    - Build command: `npm run build`
+    - Publish directory: `dist`
+    - Functions directory: `netlify/functions`
+
+5.  **Deploy:**
+    - Click "Deploy" and Netlify will automatically build and deploy your application
+    - Your site will be live at `https://your-site-name.netlify.app`
+
+### Production Checklist:
+
+- ✅ All environment variables are set in Netlify Dashboard
+- ✅ `.env` file is in `.gitignore` and never committed
+- ✅ API keys are not exposed in the repository
+- ✅ `npm run build` completes successfully
+- ✅ CORS is properly configured if needed
+- ✅ Supabase authentication is enabled
+- ✅ Error handling and logging are in place
+

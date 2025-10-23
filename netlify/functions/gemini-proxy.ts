@@ -69,7 +69,8 @@ const generateInternships = async (): Promise<Internship[]> => {
         },
     });
 
-    const jsonText = response.text.trim();
+    const jsonText = response.text?.trim();
+    if (!jsonText) throw new Error("No response text from API");
     return JSON.parse(jsonText);
 };
 
@@ -137,7 +138,8 @@ const getRecommendations = async (userProfile: UserProfile, internships: Interns
         },
     });
 
-    const jsonText = response.text.trim();
+    const jsonText = response.text?.trim();
+    if (!jsonText) throw new Error("No response text from API");
     const recommendedInternships: Internship[] = JSON.parse(jsonText);
     return recommendedInternships.sort((a, b) => (b.matchScore || 0) - (a.matchScore || 0));
 };
