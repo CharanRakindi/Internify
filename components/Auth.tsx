@@ -17,44 +17,114 @@ const Auth: React.FC<AuthProps> = ({ theme = 'light', onThemeToggle = () => {} }
 
     const handleLogin = async (event: React.FormEvent) => {
         event.preventDefault();
+        
+        // Validate inputs
+        if (!email || !password) {
+            setError('Please enter both email and password.');
+            return;
+        }
+
+        if (password.length < 6) {
+            setError('Password must be at least 6 characters.');
+            return;
+        }
+
+        if (!email.includes('@')) {
+            setError('Please enter a valid email address.');
+            return;
+        }
+
         setLoading(true);
         setError(null);
         setMessage(null);
 
         if (!supabase) {
-            setError("Authentication service is not configured.");
+            setError("Authentication service is not configured. Please contact support.");
             setLoading(false);
             return;
         }
 
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        try {
+            const { error } = await supabase.auth.signInWithPassword({ 
+                email: email.toLowerCase().trim(), 
+                password 
+            });
 
-        if (error) {
-            setError(error.message);
+            if (error) {
+                // Handle specific error messages
+                if (error.message.includes('Invalid login credentials')) {
+                    setError('Invalid email or password. Please try again.');
+                } else if (error.message.includes('Email not confirmed')) {
+                    setError('Please confirm your email address first.');
+                } else {
+                    setError(error.message || 'Failed to sign in. Please try again.');
+                }
+            }
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred.';
+            setError(`Sign in failed: ${errorMessage}`);
+            console.error('Sign in error:', err);
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     };
 
     const handleSignUp = async (event: React.FormEvent) => {
         event.preventDefault();
+
+        // Validate inputs
+        if (!email || !password) {
+            setError('Please enter both email and password.');
+            return;
+        }
+
+        if (password.length < 6) {
+            setError('Password must be at least 6 characters.');
+            return;
+        }
+
+        if (!email.includes('@')) {
+            setError('Please enter a valid email address.');
+            return;
+        }
+
         setLoading(true);
         setError(null);
         setMessage(null);
 
         if (!supabase) {
-            setError("Authentication service is not configured.");
+            setError("Authentication service is not configured. Please contact support.");
             setLoading(false);
             return;
         }
 
-        const { error } = await supabase.auth.signUp({ email, password });
+        try {
+            const { data, error } = await supabase.auth.signUp({ 
+                email: email.toLowerCase().trim(), 
+                password 
+            });
 
-        if (error) {
-            setError(error.message);
-        } else {
-            setMessage('Check your email for the login link!');
+            if (error) {
+                // Handle specific error messages
+                if (error.message.includes('already registered')) {
+                    setError('This email is already registered. Please sign in instead.');
+                } else if (error.message.includes('invalid')) {
+                    setError('Invalid email address. Please check and try again.');
+                } else {
+                    setError(error.message || 'Failed to sign up. Please try again.');
+                }
+            } else if (data?.user) {
+                setMessage('🎉 Account created! Check your email to confirm your account.');
+                setEmail('');
+                setPassword('');
+            }
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred.';
+            setError(`Sign up failed: ${errorMessage}`);
+            console.error('Sign up error:', err);
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     };
 
     const formAction = isSignUp ? handleSignUp : handleLogin;

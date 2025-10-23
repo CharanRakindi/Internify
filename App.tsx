@@ -223,40 +223,91 @@ const App: React.FC = () => {
     const [session, setSession] = useState<Session | null>(null);
     const [authLoading, setAuthLoading] = useState(true);
     const [theme, setTheme] = useState<'light' | 'dark'>(() => {
-        if (typeof window !== 'undefined' && localStorage.getItem('theme')) {
-            return localStorage.getItem('theme') as 'light' | 'dark';
-        }
-        if (typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            return 'dark';
+        // Initialize theme from localStorage or system preference
+        if (typeof window !== 'undefined') {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light' || savedTheme === 'dark') {
+                return savedTheme;
+            }
+            // Check system preference
+            if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                return 'dark';
+            }
         }
         return 'light';
     });
 
+    // Apply theme to DOM immediately on mount and when theme changes
     useEffect(() => {
-        const root = window.document.documentElement;
+        const applyTheme = (themeValue: 'light' | 'dark') => {
+            const root = document.documentElement;
+            if (themeValue === 'dark') {
+                root.classList.add('dark');
+            } else {
+                root.classList.remove('dark');
+            }
+            try {
+                localStorage.setItem('theme', themeValue);
+            } catch (error) {
+                console.error('Failed to save theme preference:', error);
+            }
+        };
+
+        applyTheme(theme);
+    }, [theme]);
+
+    // Initialize theme on first mount
+    useEffect(() => {
+        const root = document.documentElement;
         if (theme === 'dark') {
             root.classList.add('dark');
         } else {
             root.classList.remove('dark');
         }
-        localStorage.setItem('theme', theme);
-    }, [theme]);
+    }, []);
 
+    // Handle Supabase auth
     useEffect(() => {
-        if (supabase) {
-            supabase.auth.getSession().then(({ data: { session } }: { data: { session: Session | null } }) => {
-                setSession(session);
-                setAuthLoading(false);
-            });
-
-            const { data: { subscription } } = supabase.auth.onAuthStateChange((_event: string, session: Session | null) => {
-                setSession(session);
-            });
-
-            return () => subscription.unsubscribe();
-        } else {
+        if (!supabase) {
             setAuthLoading(false);
+            return;
         }
+
+        let isMounted = true;
+
+        const initializeAuth = async () => {
+            try {
+                const { data: { session: currentSession }, error } = await supabase!.auth.getSession();
+                if (error) {
+                    console.error('Error getting session:', error);
+                }
+                if (isMounted) {
+                    setSession(currentSession);
+                    setAuthLoading(false);
+                }
+            } catch (error) {
+                console.error('Error initializing auth:', error);
+                if (isMounted) {
+                    setAuthLoading(false);
+                }
+            }
+        };
+
+        initializeAuth();
+
+        // Subscribe to auth state changes
+        const { data } = supabase!.auth.onAuthStateChange((_event: string, session: Session | null) => {
+            if (isMounted) {
+                setSession(session);
+            }
+        });
+
+        return () => {
+            isMounted = false;
+            if (data?.subscription) {
+                data.subscription.unsubscribe();
+            }
+        };
     }, []);
 
     const handleThemeToggle = () => {
