@@ -6,6 +6,10 @@
 [build.environment]
   NODE_VERSION = "20.19.4"
   NPM_VERSION = "10.8.2"
+  VITE_SUPABASE_URL = "$SUPABASE_URL"
+  VITE_SUPABASE_ANON_KEY = "$SUPABASE_ANON_KEY"
+  VITE_GEMINI_API_KEY = "$GEMINI_API_KEY"
+  API_KEY = "$GEMINI_API_KEY"
 
 [dev]
   command = "npm run dev"
@@ -18,9 +22,21 @@
 
 [context.production.environment]
   NODE_ENV = "production"
+  VITE_SUPABASE_URL = "$SUPABASE_URL"
+  VITE_SUPABASE_ANON_KEY = "$SUPABASE_ANON_KEY"
+  VITE_GEMINI_API_KEY = "$GEMINI_API_KEY"
+  API_KEY = "$GEMINI_API_KEY"
 
 [context.deploy-preview.environment]
   NODE_ENV = "preview"
+  VITE_SUPABASE_URL = "$SUPABASE_URL"
+  VITE_SUPABASE_ANON_KEY = "$SUPABASE_ANON_KEY"
+  VITE_GEMINI_API_KEY = "$GEMINI_API_KEY"
+  API_KEY = "$GEMINI_API_KEY"
 
 [context.branch-deploy.environment]
   NODE_ENV = "preview"
+  VITE_SUPABASE_URL = "$SUPABASE_URL"
+  VITE_SUPABASE_ANON_KEY = "$SUPABASE_ANON_KEY"
+  VITE_GEMINI_API_KEY = "$GEMINI_API_KEY"
+  API_KEY = "$GEMINI_API_KEY"
