@@ -177,10 +177,12 @@ const InternshipFinder: React.FC = () => {
                     
                     {!loading && matchedInternships && matchedInternships.length > 0 && (
                         <div>
-                            <h3 className="text-2xl font-light text-center mb-4 text-neutral-900 dark:text-white">Your Internship Matches</h3>
-                            <p className="text-center text-neutral-500 dark:text-neutral-400 mb-10">Here are all available internships, sorted by relevance to your profile.</p>
-                            <div className="space-y-8">
-                                {matchedInternships.map((internship: Internship, index: number) => {
+                            <div className="text-center mb-12">
+                                <h3 className="text-3xl md:text-4xl font-light text-neutral-900 dark:text-white mb-2">🎯 Your Top Matches</h3>
+                                <p className="text-neutral-500 dark:text-neutral-400">We found {matchedInternships.length} internships for you. Here are your top 5 best matches.</p>
+                            </div>
+                            <div className="space-y-6">
+                                {matchedInternships.slice(0, 5).map((internship: Internship, index: number) => {
                                     const isSaved = savedInternships.some(
                                         (saved: Internship) => saved.company === internship.company && saved.role === internship.role
                                     );
@@ -190,10 +192,18 @@ const InternshipFinder: React.FC = () => {
                                             internship={internship}
                                             onToggleSave={handleToggleSave}
                                             isSaved={isSaved}
+                                            rank={index + 1}
                                         />
                                     );
                                 })}
                             </div>
+                            {matchedInternships.length > 5 && (
+                                <div className="text-center mt-10 p-4 bg-neutral-50 dark:bg-neutral-800/30 rounded-lg">
+                                    <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                                        Showing 5 of {matchedInternships.length} matches. <span className="font-medium">Your perfect opportunity is here! 🚀</span>
+                                    </p>
+                                </div>
+                            )}
                         </div>
                     )}
 
