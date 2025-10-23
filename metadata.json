@@ -1,0 +1,5 @@
+{
+  "name": "Internify: AI Internship Recommender",
+  "description": "An AI-powered web application that recommends internships based on a user's field of study, skills, and interests. It uses the Gemini API to analyze user profiles and find the best-matching opportunities from a curated list.",
+  "requestFramePermissions": []
+}
