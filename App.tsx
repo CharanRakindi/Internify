@@ -295,7 +295,7 @@ const App: React.FC = () => {
     }
 
     if (!session) {
-        return <Auth />;
+        return <Auth theme={theme} onThemeToggle={handleThemeToggle} />;
     }
 
     return (
