@@ -131,6 +131,33 @@ const Auth: React.FC<AuthProps> = ({ theme = 'light', onThemeToggle = () => {} }
     const buttonText = isSignUp ? 'Sign Up' : 'Sign In';
     const formTitle = isSignUp ? 'Create a New Account' : 'Sign In to Your Account';
 
+    const handleForgotPassword = async () => {
+        if (!email || !email.includes('@')) {
+            setError('Please enter your email address first, then click "Forgot password?"');
+            return;
+        }
+        if (!supabase) {
+            setError('Authentication service is not configured.');
+            return;
+        }
+        setLoading(true);
+        setError(null);
+        setMessage(null);
+        try {
+            const { error } = await supabase.auth.resetPasswordForEmail(email.toLowerCase().trim());
+            if (error) {
+                setError(error.message || 'Failed to send reset email.');
+            } else {
+                setMessage('Password reset link sent! Check your email inbox.');
+            }
+        } catch (err) {
+            setError('An unexpected error occurred. Please try again.');
+            console.error('Password reset error:', err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <div className="min-h-screen flex flex-col bg-[#fafafa] dark:bg-[#0a0a0a] font-sans">
             <Header theme={theme} onThemeToggle={onThemeToggle} />
@@ -173,6 +200,15 @@ const Auth: React.FC<AuthProps> = ({ theme = 'light', onThemeToggle = () => {} }
                                     required
                                     onChange={(e) => setPassword(e.target.value)}
                                 />
+                                {!isSignUp && (
+                                    <button
+                                        type="button"
+                                        onClick={handleForgotPassword}
+                                        className="mt-2 text-[12px] text-neutral-400 dark:text-neutral-500 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors duration-200"
+                                    >
+                                        Forgot password?
+                                    </button>
+                                )}
                             </div>
                             <button
                                 type="submit"

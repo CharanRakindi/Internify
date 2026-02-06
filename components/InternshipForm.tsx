@@ -11,8 +11,6 @@ const fileToBase64 = (file: File): Promise<string> => {
         const reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onload = () => {
-            // result is "data:mime/type;base64,the_base_64_string"
-            // we want just "the_base_64_string"
             const encoded = reader.result?.toString().split(',')[1];
             if (encoded) {
                 resolve(encoded);
@@ -24,6 +22,18 @@ const fileToBase64 = (file: File): Promise<string> => {
     });
 };
 
+const formatFileSize = (bytes: number): string => {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+};
+
+const getFileIcon = (type: string): string => {
+    if (type === 'application/pdf') return 'PDF';
+    if (type.includes('word') || type.includes('doc')) return 'DOC';
+    return 'FILE';
+};
+
 
 const InternshipForm: React.FC<InternshipFormProps> = ({ onSubmit, loading }) => {
     const [fullName, setFullName] = useState('');
@@ -33,6 +43,15 @@ const InternshipForm: React.FC<InternshipFormProps> = ({ onSubmit, loading }) =>
     const [resumeFile, setResumeFile] = useState<File | null>(null);
     const [isFileProcessing, setIsFileProcessing] = useState(false);
     const [fileError, setFileError] = useState<string | null>(null);
+
+    // Inline validation
+    const [touched, setTouched] = useState<Record<string, boolean>>({});
+    const getFieldError = (field: string, value: string): string | null => {
+        if (!touched[field]) return null;
+        if (!value.trim()) return 'This field is required.';
+        if (field === 'email' && !value.includes('@')) return 'Please enter a valid email address.';
+        return null;
+    };
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
@@ -74,7 +93,7 @@ const InternshipForm: React.FC<InternshipFormProps> = ({ onSubmit, loading }) =>
     };
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-7 animate-fade-in">
+        <form onSubmit={handleSubmit} className="space-y-7 animate-fade-in" noValidate>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div className="group">
                     <label htmlFor="fullName" className="block text-[11px] font-medium uppercase tracking-widest text-neutral-400 dark:text-neutral-500 mb-2">Full Name</label>
@@ -83,10 +102,12 @@ const InternshipForm: React.FC<InternshipFormProps> = ({ onSubmit, loading }) =>
                         id="fullName"
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
+                        onBlur={() => setTouched(t => ({ ...t, fullName: true }))}
                         required
-                        className="w-full bg-neutral-50 dark:bg-white/5 border border-neutral-200 dark:border-white/10 rounded-xl px-4 py-3 text-[15px] text-neutral-900 dark:text-white placeholder-neutral-300 dark:placeholder-neutral-600 focus:outline-none focus:ring-2 focus:ring-neutral-900/10 dark:focus:ring-white/10 focus:border-neutral-400 dark:focus:border-neutral-500 transition-all duration-300"
+                        className={`w-full bg-neutral-50 dark:bg-white/5 border rounded-xl px-4 py-3 text-[15px] text-neutral-900 dark:text-white placeholder-neutral-300 dark:placeholder-neutral-600 focus:outline-none focus:ring-2 focus:ring-neutral-900/10 dark:focus:ring-white/10 transition-all duration-300 ${getFieldError('fullName', fullName) ? 'border-red-300 dark:border-red-500/30' : 'border-neutral-200 dark:border-white/10 focus:border-neutral-400 dark:focus:border-neutral-500'}`}
                         placeholder="Jane Doe"
                     />
+                    {getFieldError('fullName', fullName) && <p className="mt-1 text-[12px] text-red-500 dark:text-red-400">{getFieldError('fullName', fullName)}</p>}
                 </div>
                 <div className="group">
                     <label htmlFor="email" className="block text-[11px] font-medium uppercase tracking-widest text-neutral-400 dark:text-neutral-500 mb-2">Email</label>
@@ -95,10 +116,12 @@ const InternshipForm: React.FC<InternshipFormProps> = ({ onSubmit, loading }) =>
                         id="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        onBlur={() => setTouched(t => ({ ...t, email: true }))}
                         required
-                        className="w-full bg-neutral-50 dark:bg-white/5 border border-neutral-200 dark:border-white/10 rounded-xl px-4 py-3 text-[15px] text-neutral-900 dark:text-white placeholder-neutral-300 dark:placeholder-neutral-600 focus:outline-none focus:ring-2 focus:ring-neutral-900/10 dark:focus:ring-white/10 focus:border-neutral-400 dark:focus:border-neutral-500 transition-all duration-300"
+                        className={`w-full bg-neutral-50 dark:bg-white/5 border rounded-xl px-4 py-3 text-[15px] text-neutral-900 dark:text-white placeholder-neutral-300 dark:placeholder-neutral-600 focus:outline-none focus:ring-2 focus:ring-neutral-900/10 dark:focus:ring-white/10 transition-all duration-300 ${getFieldError('email', email) ? 'border-red-300 dark:border-red-500/30' : 'border-neutral-200 dark:border-white/10 focus:border-neutral-400 dark:focus:border-neutral-500'}`}
                         placeholder="jane@example.com"
                     />
+                    {getFieldError('email', email) && <p className="mt-1 text-[12px] text-red-500 dark:text-red-400">{getFieldError('email', email)}</p>}
                 </div>
             </div>
             <div>
@@ -108,10 +131,12 @@ const InternshipForm: React.FC<InternshipFormProps> = ({ onSubmit, loading }) =>
                     id="fieldOfStudy"
                     value={fieldOfStudy}
                     onChange={(e) => setFieldOfStudy(e.target.value)}
+                    onBlur={() => setTouched(t => ({ ...t, fieldOfStudy: true }))}
                     required
-                    className="w-full bg-neutral-50 dark:bg-white/5 border border-neutral-200 dark:border-white/10 rounded-xl px-4 py-3 text-[15px] text-neutral-900 dark:text-white placeholder-neutral-300 dark:placeholder-neutral-600 focus:outline-none focus:ring-2 focus:ring-neutral-900/10 dark:focus:ring-white/10 focus:border-neutral-400 dark:focus:border-neutral-500 transition-all duration-300"
+                    className={`w-full bg-neutral-50 dark:bg-white/5 border rounded-xl px-4 py-3 text-[15px] text-neutral-900 dark:text-white placeholder-neutral-300 dark:placeholder-neutral-600 focus:outline-none focus:ring-2 focus:ring-neutral-900/10 dark:focus:ring-white/10 transition-all duration-300 ${getFieldError('fieldOfStudy', fieldOfStudy) ? 'border-red-300 dark:border-red-500/30' : 'border-neutral-200 dark:border-white/10 focus:border-neutral-400 dark:focus:border-neutral-500'}`}
                     placeholder="Computer Science, Finance, Marketing..."
                 />
+                {getFieldError('fieldOfStudy', fieldOfStudy) && <p className="mt-1 text-[12px] text-red-500 dark:text-red-400">{getFieldError('fieldOfStudy', fieldOfStudy)}</p>}
             </div>
             <div>
                 <label htmlFor="skills" className="block text-[11px] font-medium uppercase tracking-widest text-neutral-400 dark:text-neutral-500 mb-2">Skills &amp; Interests</label>
@@ -133,9 +158,14 @@ const InternshipForm: React.FC<InternshipFormProps> = ({ onSubmit, loading }) =>
                     className="flex items-center justify-center w-full h-28 border-2 border-dashed border-neutral-200 dark:border-white/10 rounded-2xl cursor-pointer hover:border-neutral-400 dark:hover:border-white/20 hover:bg-neutral-50 dark:hover:bg-white/[0.02] transition-all duration-300 group"
                 >
                     {resumeFile ? (
-                        <div className="text-center">
-                            <p className="text-[13px] font-medium text-neutral-700 dark:text-neutral-300">{resumeFile.name}</p>
-                            <p className="text-[11px] text-neutral-400 dark:text-neutral-600 mt-1">Click to change file</p>
+                        <div className="text-center flex items-center justify-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-neutral-100 dark:bg-white/5 flex items-center justify-center flex-shrink-0">
+                                <span className="text-[10px] font-bold text-neutral-500 dark:text-neutral-400 uppercase">{getFileIcon(resumeFile.type)}</span>
+                            </div>
+                            <div className="text-left">
+                                <p className="text-[13px] font-medium text-neutral-700 dark:text-neutral-300 truncate max-w-[200px]">{resumeFile.name}</p>
+                                <p className="text-[11px] text-neutral-400 dark:text-neutral-600">{formatFileSize(resumeFile.size)} · Click to change</p>
+                            </div>
                         </div>
                     ) : (
                         <div className="text-center">
