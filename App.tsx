@@ -141,12 +141,15 @@ const InternshipFinder: React.FC = () => {
     };
 
     return (
-        <main className="flex-grow container mx-auto px-4 py-8 md:py-16">
-            <div className="max-w-2xl mx-auto">
+        <main className="flex-grow">
+            <div className="max-w-2xl mx-auto px-5 py-12 md:py-20">
                 {savedInternships.length > 0 && (
-                    <section id="saved-section" className="mb-16">
-                        <h3 className="text-2xl font-light text-center mb-10 text-neutral-900 dark:text-white">Your Saved Internships</h3>
-                        <div className="space-y-8">
+                    <section id="saved-section" className="mb-20 animate-fade-in">
+                        <div className="text-center mb-10">
+                            <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-neutral-400 dark:text-neutral-500 mb-3">Saved</p>
+                            <h3 className="text-[28px] font-semibold text-neutral-900 dark:text-white tracking-tight">Your Collection</h3>
+                        </div>
+                        <div className="space-y-4">
                             {savedInternships.map((internship: Internship) => (
                                 <InternshipCard
                                     key={`saved-${internship.company}-${internship.role}`}
@@ -159,12 +162,15 @@ const InternshipFinder: React.FC = () => {
                     </section>
                 )}
 
-                <section id="form-section" className="mb-16">
-                     <h2 className="text-4xl md:text-5xl font-light text-center text-neutral-900 dark:text-white mb-4">Find Your Perfect Internship</h2>
-                     <p className="text-center text-neutral-500 dark:text-neutral-400 mb-10">Fill out the form below, upload your resume, and let our AI find the best opportunities for you.</p>
+                <section id="form-section" className="mb-20 animate-fade-in">
+                     <div className="text-center mb-12">
+                         <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-neutral-400 dark:text-neutral-500 mb-3">Discover</p>
+                         <h2 className="text-[36px] md:text-[44px] font-semibold text-neutral-900 dark:text-white tracking-tight leading-[1.1] mb-4">Find your perfect<br />internship.</h2>
+                         <p className="text-[15px] text-neutral-400 dark:text-neutral-500 max-w-md mx-auto leading-relaxed">Upload your resume and let AI match you with the best opportunities tailored to your skills.</p>
+                     </div>
                      {internshipsLoading ? (
-                        <div className="text-center p-8 border border-neutral-200 dark:border-neutral-800 rounded-md">
-                            <Loader text="Loading fresh internships..." />
+                        <div className="text-center p-10 bg-white dark:bg-white/[0.02] border border-neutral-200/70 dark:border-white/[0.06] rounded-2xl">
+                            <Loader text="Loading internships…" />
                         </div>
                      ) : (
                         <InternshipForm onSubmit={handleFormSubmit} loading={loading} />
@@ -172,35 +178,45 @@ const InternshipFinder: React.FC = () => {
                 </section>
                 
                 <section id="results-section">
-                    {loading && <Loader text="Analyzing your profile..."/>}
-                    {error && <div className="text-center text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900/50 p-4 rounded-md">{error}</div>}
+                    {loading && (
+                        <div className="py-16 animate-fade-in">
+                            <Loader text="Analyzing your profile…"/>
+                        </div>
+                    )}
+                    {error && (
+                        <div className="text-center p-5 bg-red-50 dark:bg-red-500/5 border border-red-100 dark:border-red-500/10 rounded-2xl animate-fade-in">
+                            <p className="text-[14px] text-red-600 dark:text-red-400">{error}</p>
+                        </div>
+                    )}
                     
                     {!loading && matchedInternships && matchedInternships.length > 0 && (
-                        <div>
+                        <div className="animate-fade-in">
                             <div className="text-center mb-12">
-                                <h3 className="text-3xl md:text-4xl font-light text-neutral-900 dark:text-white mb-2">🎯 Your Top Matches</h3>
-                                <p className="text-neutral-500 dark:text-neutral-400">We found {matchedInternships.length} internships for you. Here are your top 5 best matches.</p>
+                                <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-neutral-400 dark:text-neutral-500 mb-3">Results</p>
+                                <h3 className="text-[32px] md:text-[38px] font-semibold text-neutral-900 dark:text-white tracking-tight mb-3">Your top matches.</h3>
+                                <p className="text-[15px] text-neutral-400 dark:text-neutral-500">We found {matchedInternships.length} opportunities. Here are your best 5.</p>
                             </div>
-                            <div className="space-y-6">
+                            <div className="space-y-4">
                                 {matchedInternships.slice(0, 5).map((internship: Internship, index: number) => {
                                     const isSaved = savedInternships.some(
                                         (saved: Internship) => saved.company === internship.company && saved.role === internship.role
                                     );
                                     return (
-                                        <InternshipCard
-                                            key={`${internship.company}-${internship.role}-${index}`}
-                                            internship={internship}
-                                            onToggleSave={handleToggleSave}
-                                            isSaved={isSaved}
-                                            rank={index + 1}
-                                        />
+                                        <div key={`${internship.company}-${internship.role}-${index}`} className={`stagger-${index + 1}`}>
+                                            <InternshipCard
+                                                internship={internship}
+                                                onToggleSave={handleToggleSave}
+                                                isSaved={isSaved}
+                                                rank={index + 1}
+                                            />
+                                        </div>
                                     );
                                 })}
                             </div>
                             {matchedInternships.length > 5 && (
-                                <div className="text-center mt-10 p-4 bg-neutral-50 dark:bg-neutral-800/30 rounded-lg">
-                                    <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                                        Showing 5 of {matchedInternships.length} matches. <span className="font-medium">Your perfect opportunity is here! 🚀</span>
+                                <div className="text-center mt-8">
+                                    <p className="text-[13px] text-neutral-400 dark:text-neutral-500">
+                                        Showing 5 of {matchedInternships.length} matches
                                     </p>
                                 </div>
                             )}
@@ -208,9 +224,9 @@ const InternshipFinder: React.FC = () => {
                     )}
 
                     {!loading && submitted && matchedInternships?.length === 0 && !error && (
-                        <div className="text-center text-neutral-500 dark:text-neutral-400 border border-neutral-200 dark:border-neutral-800 p-8 rounded-md">
-                            <h3 className="text-xl font-medium mb-2">No Recommendations Found</h3>
-                            <p>We couldn't find any suitable internships based on your profile. Try adjusting your skills or field of study.</p>
+                        <div className="text-center p-10 bg-white dark:bg-white/[0.02] border border-neutral-200/70 dark:border-white/[0.06] rounded-2xl animate-fade-in">
+                            <h3 className="text-[18px] font-semibold text-neutral-900 dark:text-white mb-2">No matches found</h3>
+                            <p className="text-[14px] text-neutral-400 dark:text-neutral-500">Try adjusting your skills or field of study to see more results.</p>
                         </div>
                     )}
                 </section>
@@ -313,8 +329,8 @@ const App: React.FC = () => {
     // Gracefully handle missing Supabase configuration
     if (!supabase) {
         return (
-            <div className="min-h-screen flex flex-col font-sans text-neutral-800 dark:text-neutral-200">
-                <div className="bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 text-center p-2 text-sm" role="alert">
+            <div className="min-h-screen flex flex-col font-sans bg-[#fafafa] dark:bg-[#0a0a0a] text-neutral-800 dark:text-neutral-200">
+                <div className="bg-amber-50 dark:bg-amber-500/5 text-amber-700 dark:text-amber-400 text-center py-2.5 px-4 text-[13px] border-b border-amber-100 dark:border-amber-500/10" role="alert">
                    {supabaseError}
                 </div>
                 <Header 
@@ -329,8 +345,8 @@ const App: React.FC = () => {
     
     if (authLoading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-white dark:bg-neutral-900">
-                <Loader text="Initializing..." />
+            <div className="min-h-screen flex items-center justify-center bg-[#fafafa] dark:bg-[#0a0a0a]">
+                <Loader text="Initializing…" />
             </div>
         );
     }
@@ -340,7 +356,7 @@ const App: React.FC = () => {
     }
 
     return (
-        <div className="min-h-screen flex flex-col font-sans text-neutral-800 dark:text-neutral-200">
+        <div className="min-h-screen flex flex-col font-sans bg-[#fafafa] dark:bg-[#0a0a0a] text-neutral-800 dark:text-neutral-200">
             <Header 
                 theme={theme} 
                 onThemeToggle={handleThemeToggle} 
