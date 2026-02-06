@@ -256,16 +256,6 @@ const App: React.FC = () => {
         applyTheme(theme);
     }, [theme]);
 
-    // Initialize theme on first mount
-    useEffect(() => {
-        const root = document.documentElement;
-        if (theme === 'dark') {
-            root.classList.add('dark');
-        } else {
-            root.classList.remove('dark');
-        }
-    }, []);
-
     // Handle Supabase auth
     useEffect(() => {
         if (!supabase) {
