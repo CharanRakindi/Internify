@@ -15,24 +15,25 @@ const Auth: React.FC<AuthProps> = ({ theme = 'light', onThemeToggle = () => {} }
     const [message, setMessage] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
 
-    const handleLogin = async (event: React.FormEvent) => {
-        event.preventDefault();
-        
-        // Validate inputs
+    const validateForm = (): boolean => {
         if (!email || !password) {
             setError('Please enter both email and password.');
-            return;
+            return false;
         }
-
         if (password.length < 6) {
             setError('Password must be at least 6 characters.');
-            return;
+            return false;
         }
-
         if (!email.includes('@')) {
             setError('Please enter a valid email address.');
-            return;
+            return false;
         }
+        return true;
+    };
+
+    const handleLogin = async (event: React.FormEvent) => {
+        event.preventDefault();
+        if (!validateForm()) return;
 
         setLoading(true);
         setError(null);
@@ -71,22 +72,7 @@ const Auth: React.FC<AuthProps> = ({ theme = 'light', onThemeToggle = () => {} }
 
     const handleSignUp = async (event: React.FormEvent) => {
         event.preventDefault();
-
-        // Validate inputs
-        if (!email || !password) {
-            setError('Please enter both email and password.');
-            return;
-        }
-
-        if (password.length < 6) {
-            setError('Password must be at least 6 characters.');
-            return;
-        }
-
-        if (!email.includes('@')) {
-            setError('Please enter a valid email address.');
-            return;
-        }
+        if (!validateForm()) return;
 
         setLoading(true);
         setError(null);

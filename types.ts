@@ -16,7 +16,6 @@ export interface Internship {
     skillsRequired: string[];
     location: string;
     description: string;
-    applyUrl?: string;
     matchScore?: number;
     reasoning?: string;
 }

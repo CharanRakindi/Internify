@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import { Internship } from '../types';
 import ProgressBar from './ProgressBar';
 
@@ -30,7 +29,6 @@ const getLinkedInSearchUrl = (role: string, company: string): string => {
 };
 
 const InternshipCard: React.FC<InternshipCardProps> = ({ internship, onToggleSave, isSaved, rank }) => {
-    const [feedback, setFeedback] = useState<'up' | 'down' | null>(null);
 
     return (
         <div className="group relative bg-white dark:bg-white/[0.03] border border-neutral-200/70 dark:border-white/[0.06] rounded-2xl p-6 hover:shadow-lg hover:shadow-neutral-200/50 dark:hover:shadow-none dark:hover:border-white/10 hover:-translate-y-0.5 transition-all duration-500 ease-out animate-fade-in focus-within:ring-2 focus-within:ring-neutral-900/10 dark:focus-within:ring-white/10">
@@ -108,7 +106,7 @@ const InternshipCard: React.FC<InternshipCardProps> = ({ internship, onToggleSav
             {/* Bottom row: Apply link + Feedback */}
             <div className="flex items-center justify-between pt-4 border-t border-neutral-100 dark:border-white/5">
                 <a
-                    href={internship.applyUrl || getLinkedInSearchUrl(internship.role, internship.company)}
+                    href={getLinkedInSearchUrl(internship.role, internship.company)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1.5 text-[13px] font-medium text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900/20 dark:focus-visible:ring-white/20 rounded-lg px-1 -ml-1"
@@ -118,39 +116,6 @@ const InternshipCard: React.FC<InternshipCardProps> = ({ internship, onToggleSav
                     </svg>
                     Search on LinkedIn
                 </a>
-
-                {/* Feedback buttons */}
-                {internship.matchScore !== undefined && (
-                    <div className="flex items-center gap-1">
-                        <span className="text-[11px] text-neutral-300 dark:text-neutral-600 mr-1.5">Helpful?</span>
-                        <button
-                            onClick={() => setFeedback(feedback === 'up' ? null : 'up')}
-                            className={`w-7 h-7 flex items-center justify-center rounded-lg transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900/20 dark:focus-visible:ring-white/20 ${
-                                feedback === 'up'
-                                    ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-500'
-                                    : 'text-neutral-300 dark:text-neutral-600 hover:text-neutral-500 dark:hover:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-white/5'
-                            }`}
-                            aria-label="Good match"
-                        >
-                            <svg className="w-3.5 h-3.5" fill={feedback === 'up' ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M6.633 10.5c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V3a.75.75 0 01.75-.75A2.25 2.25 0 0116.5 4.5c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H14.23c-.483 0-.964-.078-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23H5.904M14.25 9h2.25M5.904 18.75c.083.228.22.442.406.614A2.243 2.243 0 017.5 20.25H8a.75.75 0 00.75-.75v-4.5a.75.75 0 00-.75-.75h-.908a2.25 2.25 0 01-1.521-.588l-.065-.065A1.504 1.504 0 005 12.191V10.5" />
-                            </svg>
-                        </button>
-                        <button
-                            onClick={() => setFeedback(feedback === 'down' ? null : 'down')}
-                            className={`w-7 h-7 flex items-center justify-center rounded-lg transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900/20 dark:focus-visible:ring-white/20 ${
-                                feedback === 'down'
-                                    ? 'bg-red-50 dark:bg-red-500/10 text-red-500'
-                                    : 'text-neutral-300 dark:text-neutral-600 hover:text-neutral-500 dark:hover:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-white/5'
-                            }`}
-                            aria-label="Bad match"
-                        >
-                            <svg className="w-3.5 h-3.5 rotate-180" fill={feedback === 'down' ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M6.633 10.5c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V3a.75.75 0 01.75-.75A2.25 2.25 0 0116.5 4.5c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H14.23c-.483 0-.964-.078-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23H5.904M14.25 9h2.25M5.904 18.75c.083.228.22.442.406.614A2.243 2.243 0 017.5 20.25H8a.75.75 0 00.75-.75v-4.5a.75.75 0 00-.75-.75h-.908a2.25 2.25 0 01-1.521-.588l-.065-.065A1.504 1.504 0 005 12.191V10.5" />
-                            </svg>
-                        </button>
-                    </div>
-                )}
             </div>
         </div>
     );
